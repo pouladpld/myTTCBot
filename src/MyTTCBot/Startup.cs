@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Net;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyTTCBot.Bot;
 using MyTTCBot.Commands;
+using MyTTCBot.Models;
 using MyTTCBot.Services;
 using NetTelegram.Bot.Framework;
+using NextBus.NET;
 using RecurrentTasks;
 
 namespace MyTTCBot
@@ -30,6 +34,14 @@ namespace MyTTCBot
 
         public void ConfigureServices(IServiceCollection services)
         {
+            {
+                var connStr = _configuration["ConnectionString"];
+                var migrationsAssembly = typeof(MyTtcDbContext).GetTypeInfo().Assembly.GetName().Name;
+
+                services.AddDbContext<MyTtcDbContext>(builder =>
+                    builder.UseNpgsql(connStr, options => options.MigrationsAssembly(migrationsAssembly)));
+            }
+
             services.AddTelegramBot<MyTtcBot>(_configuration)
                 .AddUpdateHandler<BusCommand>()
                 .AddUpdateHandler<LocationHanlder>()
@@ -39,7 +51,10 @@ namespace MyTTCBot
 
             services.AddTask<BotUpdateGetterTask<MyTtcBot>>();
 
-            services.AddTransient<INextBusService, NextBusService>();
+            services.AddTransient<INextBusDataParser, NextBusDataParser>();
+            services.AddTransient<INextBusHttpClient, NextBusHttpClient>();
+            services.AddTransient<INextBusClient, NextBusClient>();
+            services.AddTransient<INextBusService, NextBusService>(); // ToDo: Remove
 
             services.AddMemoryCache();
         }

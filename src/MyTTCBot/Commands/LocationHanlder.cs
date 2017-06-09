@@ -1,5 +1,8 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using MyTTCBot.Models;
 using NetTelegram.Bot.Framework;
@@ -12,11 +15,14 @@ namespace MyTTCBot.Commands
     {
         public const string OsmAndLocationRegex = @"geo:([+|-]?\d+(?:.\d+)?),([+|-]?\d+(?:.\d+)?)";
 
+        private readonly MyTtcDbContext _dbContext;
+
         private readonly IMemoryCache _cache;
 
-        public LocationHanlder(IMemoryCache cache)
+        public LocationHanlder(IMemoryCache cache, MyTtcDbContext dbContext)
         {
             _cache = cache;
+            _dbContext = dbContext;
         }
 
         public override bool CanHandleUpdate(IBot bot, Update update)
@@ -49,9 +55,38 @@ namespace MyTTCBot.Commands
                     Longitude = double.Parse(match.Groups[2].Value),
                 };
             }
-
-            _cache.Set(userChat, context);
+            var slidingExpiryOption = new MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.FromHours(1) };
+            _cache.Set(userChat, context, slidingExpiryOption);
+            await AddLocation(update);
             return await Task.FromResult(UpdateHandlingResult.Handled);
+        }
+
+        private async Task AddLocation(Update update)
+        {
+            try
+            {
+                var uc = await _dbContext.UserChatContexts.FirstOrDefaultAsync(
+                    x => x.UserId == update.Message.From.Id && x.ChatId == update.Message.Chat.Id);
+
+                if (uc == null)
+                {
+                    uc = (UserChatContext)update;
+
+                    var location = new FrequentLocation
+                    {
+                        Latitude = update.Message.Location.Latitude,
+                        Longitude = update.Message.Location.Longitude,
+                        Name = "Some name",
+                    };
+
+                    uc.FrequentLocations.Add(location);
+                    await _dbContext.AddAsync(uc);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
         }
     }
 }
