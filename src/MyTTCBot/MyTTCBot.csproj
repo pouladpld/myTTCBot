@@ -36,14 +36,18 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="1.1.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="1.1.2" />
-    <PackageReference Include="NetTelegram.Bot.Framework" Version="1.0.4" />
-    <PackageReference Include="NextBus.NET" Version="0.0.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="1.1.0" />
     <PackageReference Include="RecurrentTasks" Version="3.2.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.3.1" />
   </ItemGroup>
 
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\dependencies\NetTelegram.Bot.Framework\src\NetTelegram.Bot.Framework\NetTelegram.Bot.Framework.csproj" />
+    <ProjectReference Include="..\..\dependencies\NextBus.NET\src\NextBus.NET\NextBus.NET.csproj" />
   </ItemGroup>
 
 </Project>

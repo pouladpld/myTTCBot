@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
-using MyTTCBot.Commands;
 using MyTTCBot.Models;
 using MyTTCBot.Services;
 using NetTelegramBotApi.Requests;

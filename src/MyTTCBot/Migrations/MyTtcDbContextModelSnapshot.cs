@@ -18,8 +18,9 @@ namespace MyTTCBot.Migrations
 
             modelBuilder.Entity("MyTTCBot.Models.FrequentLocation", b =>
                 {
-                    b.Property<int>("UserChatContextId")
-                        .HasColumnName("userchat_context_id");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -37,7 +38,12 @@ namespace MyTTCBot.Migrations
                         .HasColumnName("name")
                         .HasMaxLength(20);
 
-                    b.HasKey("UserChatContextId");
+                    b.Property<int>("UserChatContextId")
+                        .HasColumnName("userchat_context_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserChatContextId");
 
                     b.ToTable("frequent_location");
                 });

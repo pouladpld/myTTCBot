@@ -4,7 +4,7 @@ using NetTelegram.Bot.Framework.Abstractions;
 using NetTelegramBotApi.Requests;
 using NetTelegramBotApi.Types;
 
-namespace MyTTCBot.Commands
+namespace MyTTCBot.Handlers.Commands
 {
     public class StartCommandArgs : ICommandArgs
     {
@@ -23,7 +23,7 @@ namespace MyTTCBot.Commands
 
         public override async Task<UpdateHandlingResult> HandleCommand(Update update, StartCommandArgs args)
         {
-            await Bot.MakeRequestAsync(new SendMessage(update.Message.Chat.Id, "Welcome!"))
+            await Bot.MakeRequest(new SendMessage(update.Message.Chat.Id, "Welcome!"))
                 .ConfigureAwait(false);
             return UpdateHandlingResult.Handled;
         }

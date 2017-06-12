@@ -9,7 +9,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyTTCBot.Bot;
-using MyTTCBot.Commands;
+using MyTTCBot.Handlers;
+using MyTTCBot.Handlers.Commands;
 using MyTTCBot.Models;
 using MyTTCBot.Services;
 using NetTelegram.Bot.Framework;
@@ -27,7 +28,7 @@ namespace MyTTCBot
             _configuration = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddEnvironmentVariables("MyTTCBot_")
-                .AddJsonFile("appsettings.json", optional: true)
+                .AddJsonFile("appsettings.json")
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .Build();
         }
@@ -45,16 +46,23 @@ namespace MyTTCBot
             services.AddTelegramBot<MyTtcBot>(_configuration)
                 .AddUpdateHandler<BusCommand>()
                 .AddUpdateHandler<LocationHanlder>()
+                .AddUpdateHandler<CallbackQueryHandler>()
+                .AddUpdateHandler<SaveCommand>()
+                .AddUpdateHandler<SavedLocationHandler>()
+                .AddUpdateHandler<DeleteCommand>()
                 .AddUpdateHandler<HelpCommand>()
                 .AddUpdateHandler<StartCommand>()
                 .Configure();
 
             services.AddTask<BotUpdateGetterTask<MyTtcBot>>();
 
+            services.AddTransient<ILocationsManager, LocationsManager>();
+            services.AddTransient<IPredictionsManager, PredictionsManager>();
+
             services.AddTransient<INextBusDataParser, NextBusDataParser>();
             services.AddTransient<INextBusHttpClient, NextBusHttpClient>();
             services.AddTransient<INextBusClient, NextBusClient>();
-            services.AddTransient<INextBusService, NextBusService>(); // ToDo: Remove
+            services.AddTransient<ITtcBusService, TtcBusService>();
 
             services.AddMemoryCache();
         }
@@ -69,7 +77,7 @@ namespace MyTTCBot
                 app.UseDeveloperExceptionPage();
                 app.UseBrowserLink();
 
-                app.StartTask<BotUpdateGetterTask<MyTtcBot>>(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1));
+                app.StartTask<BotUpdateGetterTask<MyTtcBot>>(TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(1));
             }
             else
             {

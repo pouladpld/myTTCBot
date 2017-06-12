@@ -6,6 +6,8 @@ namespace MyTTCBot.Models
     {
         public DbSet<UserChatContext> UserChatContexts { get; set; }
 
+        public DbSet<FrequentLocation> FrequentLocations { get; set; }
+
         public MyTtcDbContext(DbContextOptions<MyTtcDbContext> options)
             : base(options)
         {

@@ -8,7 +8,7 @@ using MyTTCBot.Models;
 namespace MyTTCBot.Migrations
 {
     [DbContext(typeof(MyTtcDbContext))]
-    [Migration("20170609013543_AddUserChatContext")]
+    [Migration("20170609180243_AddUserChatContext")]
     partial class AddUserChatContext
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -19,8 +19,9 @@ namespace MyTTCBot.Migrations
 
             modelBuilder.Entity("MyTTCBot.Models.FrequentLocation", b =>
                 {
-                    b.Property<int>("UserChatContextId")
-                        .HasColumnName("userchat_context_id");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -38,7 +39,12 @@ namespace MyTTCBot.Migrations
                         .HasColumnName("name")
                         .HasMaxLength(20);
 
-                    b.HasKey("UserChatContextId");
+                    b.Property<int>("UserChatContextId")
+                        .HasColumnName("userchat_context_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserChatContextId");
 
                     b.ToTable("frequent_location");
                 });
